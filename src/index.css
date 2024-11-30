@@ -6,6 +6,10 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-image: url('./img/dark-sne.JPG');
+  background-repeat: repeat;
+  /* Optional properties */
+  background-size: auto; /* or specific size like 100px */
 }
 
 code {

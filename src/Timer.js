@@ -6,15 +6,29 @@ const Timer = () => {
   const [isRunning, setIsRunning] = useState(false);
   const [isGamingMode, setIsGamingMode] = useState(false);
   const [gamingTime, setGamingTime] = useState(0);
+  const [totalWorkTime, setTotalWorkTime] = useState(0);
+
+  useEffect(() => {
+    document.title = `Work Timer - ${formatTime(time)}`;
+  }, [time]);
 
   useEffect(() => {
     let interval;
     if (isRunning) {
       interval = setInterval(() => {
         if (isGamingMode) {
-          setGamingTime((prevTime) => prevTime - 1);
+          setGamingTime((prevTime) => {
+            const newTime = prevTime - 1;
+            if (newTime <= 0) {
+              setIsRunning(false);
+              alert("Gaming time is over!");
+              return 0;
+            }
+            return newTime;
+          });
         } else {
           setTime((prevTime) => prevTime + 1);
+          setTotalWorkTime((prevTime) => prevTime + 1);
           setGamingTime((prevTime) => prevTime + 0.2);
         }
       }, 1000);
@@ -24,12 +38,19 @@ const Timer = () => {
 
   const handleStart = () => setIsRunning(true);
   const handlePause = () => setIsRunning(false);
-  const handleReset = () => {
+  const handleWorkReset = () => {
     setTime(0);
     setIsRunning(false);
+  };
+  const handleGamingReset = () => {
+    setGamingTime(0);
     setIsGamingMode(false);
   };
-  const handleGamingMode = () => setIsGamingMode((prevMode) => !prevMode);
+  const handleGamingMode = () => {
+    if (!isRunning) {
+      setIsGamingMode((prevMode) => !prevMode);
+    }
+  };
 
   const formatTime = (timeInSeconds) => {
     const minutes = Math.floor(timeInSeconds / 60);
@@ -71,22 +92,37 @@ const Timer = () => {
                 Pause
               </button>
             )}
-            <button
-              onClick={handleReset}
-              className="px-4 py-2 border border-gray-600 text-gray-300 rounded-md hover:bg-gray-700 transition-colors"
-            >
-              Reset
-            </button>
-            <button
-              onClick={handleGamingMode}
-              className={`px-4 py-2 rounded-md transition-colors ${
-                isGamingMode 
-                  ? 'bg-green-600 text-gray-100 hover:bg-green-700' 
-                  : 'bg-gray-600 text-gray-100 hover:bg-gray-700'
-              }`}
-            >
-              {isGamingMode ? 'Exit Gaming Mode' : 'Gaming Mode'}
-            </button>
+            {!isRunning && (
+              <button
+                onClick={handleGamingMode}
+                className={`px-4 py-2 rounded-md transition-colors ${
+                  isGamingMode 
+                    ? 'bg-green-600 text-gray-100 hover:bg-green-700' 
+                    : 'bg-gray-600 text-gray-100 hover:bg-gray-700'
+                }`}
+              >
+                {isGamingMode ? 'Exit Gaming Mode' : 'Gaming Mode'}
+              </button>
+            )}
+            {isRunning && (
+              <button
+                onClick={handleWorkReset}
+                className="px-4 py-2 border border-gray-600 text-gray-300 rounded-md hover:bg-gray-700 transition-colors"
+              >
+                Reset Work
+              </button>
+            )}
+            {isGamingMode && (
+              <button
+                onClick={handleGamingReset}
+                className="px-4 py-2 border border-gray-600 text-gray-300 rounded-md hover:bg-gray-700 transition-colors"
+              >
+                Reset Gaming
+              </button>
+            )}
+          </div>
+          <div className="flex gap-4 text-gray-400">
+            <div>Total Work Time: {formatTime(totalWorkTime)}</div>
           </div>
         </div>
       </div>
